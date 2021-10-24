@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 
 class Approximator(ABC):
@@ -5,46 +6,34 @@ class Approximator(ABC):
     def calcNext(self, x_prev, y_prev, step):
         raise NotImplementedError
 
+    def calcYPrime(self, x, y):
+        return y / x - y - x
+
 class EulerApproximator(Approximator):
     def calcNext(self, x_prev, y_prev, step):
-        # TODO: Change the equation
-        y_curr = y_prev + step * (y_prev ** 2 + x_prev * y_prev - x_prev ** 2) / (x_prev ** 2)
+        y_curr = y_prev + step * self.calcYPrime(x_prev, y_prev)
         return y_curr
 
 class ImprovedEulerApproximator(Approximator):
     def calcNext(self, x_prev, y_prev, step):
-        # TODO: Change the equation
-        f = (y_prev ** 2 + x_prev * y_prev - x_prev ** 2) / (x_prev ** 2)
-        x = x_prev + step / 2
-        y = y_prev + step / 2 * f
-
-        y_curr = y_prev + step * (y ** 2 + x * y - x ** 2) / (x ** 2)
+        y_curr = y_prev + step * self.calcYPrime(x_prev + step / 2, y_prev + (step / 2) * self.calcYPrime(x_prev, y_prev))
         return y_curr
 
 class RungeKuttaApproximator(Approximator):
     def calcNext(self, x_prev, y_prev, step):
         # TODO: Change the equation
-        k1 = (y_prev ** 2 + x_prev * y_prev - x_prev ** 2) / (x_prev ** 2)
+        k1 = self.calcYPrime(x_prev, y_prev)
+        k2 = self.calcYPrime(x_prev + step / 2, y_prev + (step * k1) / 2)
+        k3 = self.calcYPrime(x_prev + step / 2, y_prev + (step * k2) / 2)
+        k4 = self.calcYPrime(x_prev + step, y_prev + step * k3)
 
-        x = x_prev + step / 2
-        y = y_prev + step * k1 / 2
-        k2 = (y ** 2 + x * y - x ** 2) / (x ** 2)
-
-        y = y_prev + step * k2 / 2
-        k3 = (y ** 2 + x * y - x ** 2) / (x ** 2)
-
-        x = x_prev + step
-        y = y_prev + step * k3
-        k4 = (y ** 2 + x * y - x ** 2) / (x ** 2)
-
-        y_curr = y_prev + step * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        y_curr = y_prev + (step / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
         return y_curr
 
 class Platform:
 
     def calcExactSolution(self, x):
-        # TODO: Change the equation
-        y = (x * (1 + x ** 2 / 3)) / (1 - x ** 2 / 3)
+        y = math.e ** (1 - x) * x - x
         return y
 
     def getPoints(self, x0, x_final, y0, step):
