@@ -7,6 +7,8 @@ class Approximator(ABC):
         raise NotImplementedError
 
     def calcYPrime(self, x, y):
+        if x == 0:
+            x = x + 0.000001
         return y / x - y - x
 
 class EulerApproximator(Approximator):
@@ -21,7 +23,6 @@ class ImprovedEulerApproximator(Approximator):
 
 class RungeKuttaApproximator(Approximator):
     def calcNext(self, x_prev, y_prev, step):
-        # TODO: Change the equation
         k1 = self.calcYPrime(x_prev, y_prev)
         k2 = self.calcYPrime(x_prev + step / 2, y_prev + (step * k1) / 2)
         k3 = self.calcYPrime(x_prev + step / 2, y_prev + (step * k2) / 2)
@@ -32,14 +33,21 @@ class RungeKuttaApproximator(Approximator):
 
 class Platform:
 
+    def calcConstant(self, x0, y0):
+        c = (y0 + x0) / (math.e ** -x0 * x0)
+        print(c)
+        return c
+
     def calcExactSolution(self, x):
-        y = math.e ** (1 - x) * x - x
+        y = self.c * (math.e ** -x) * x - x
         return y
 
-    def getPoints(self, x0, x_final, y0, step):
+    def getPoints(self, x0, xFinal, y0, step):
+        self.c = self.calcConstant(x0, y0)
+
         xs = [x0]
         ys = [y0]
-        while x0 <= x_final:
+        while x0 <= xFinal:
             x0 += step
             y = self.calcExactSolution(x0)
             ys.append(y)
@@ -62,6 +70,8 @@ class Platform:
         return ltes
 
     def approximate(self, approximator, x0, x_final, y0, step):
+        self.c = self.calcConstant(x0, y0)
+
         approxYs = [y0]
         xs, ys = self.getPoints(x0, x_final, y0, step)
 

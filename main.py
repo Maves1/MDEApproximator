@@ -18,7 +18,7 @@ approxPlot = approxFigure.add_subplot(111)
 ltesFigure = Figure(figsize=(6, 6), dpi=100)
 ltesPlot = ltesFigure.add_subplot(111)
 
-gtesFigure = Figure(figsize=(10, 6), dpi=100)
+gtesFigure = Figure(figsize=(6, 6), dpi=100)
 gtesPlot = gtesFigure.add_subplot(111)
 
 platform = Platform()
